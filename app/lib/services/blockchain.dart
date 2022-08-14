@@ -18,8 +18,9 @@ const String contractsFolder = "contracts/";
 class BlockchainService {
   final LogService _log = logService.fork("ETH");
 
-  final String _privateKey =
-      "d0c854446eed1b7d14e58ffe5e4ae3b844ff1ef95a78b22b36b847fc26d504f1"; // Private key (not safe to put it in code, use metamask instead)
+  // TODO: Connect Metamask instead
+  final String publicKey = "0x170f89A2BcabF1BddD7a38e1E6909Ab85Ee8a374";
+  final String privateKey = "86ffe6e81225b7afd08edaef30a9f66429b1e21884817a5259d9694ac2483893";
 
   late Web3Client _client;
 
@@ -41,7 +42,7 @@ class BlockchainService {
 
   Future<void> getCredentials() async {
     try {
-      _creds = EthPrivateKey.fromHex(_privateKey);
+      _creds = EthPrivateKey.fromHex(privateKey);
       EtherAmount balance = await _client.getBalance(_creds.address);
 
       _log.info("Credentials fetched with balance ${balance.getInEther}ETH");
@@ -100,18 +101,22 @@ class BlockchainService {
       List<Note> notes = [];
 
       for (int i = 0; i < totalNotes; i++) {
-        var tmp = await _client.call(
+        var tmpData = await _client.call(
           contract: _notesContract,
           function: _notes,
           params: [BigInt.from(i)],
         );
 
-        if (tmp[noteTitleIndex].isNotEmpty) {
-          notes.add(Note.fromBlockchainList(tmp));
+        if (tmpData[Note.titleIndex].isNotEmpty) {
+          var tmp = Note.fromBlockchainList(tmpData);
+
+          if (tmp.publicKey == publicKey) {
+            notes.add(tmp);
+          }
         }
       }
 
-      _log.info("Notes fetched: $totalNotes notes");
+      _log.info("Notes fetched: ${notes.length} notes");
       return notes;
     } catch (err) {
       _log.error("Error fetching notes: $err");
@@ -119,17 +124,18 @@ class BlockchainService {
     }
   }
 
-  Future<void> addNote(Note note) async {
+  Future<void> addNote({required String title, required String description}) async {
     try {
       String hash = await _client.sendTransaction(
         _creds,
         Transaction.callContract(
           contract: _notesContract,
           function: _createNote,
-          parameters: [note.title, note.description],
+          parameters: [title, description],
         ),
       );
-      _log.info("Note added: ${note.title} (txHash $hash)");
+
+      _log.info("Note added: $title (txHash $hash)");
     } catch (err) {
       _log.error("Error adding note: $err");
     }
@@ -145,6 +151,7 @@ class BlockchainService {
           parameters: [BigInt.from(id)],
         ),
       );
+
       _log.info("Note deleted: id $id (txHash $hash)");
     } catch (err) {
       _log.error("Error deleting note: $err");

@@ -6,6 +6,7 @@ contract NotesContract {
 
     struct Note {
         uint256 id;
+        address publicKey;
         string title;
         string description;
     }
@@ -18,16 +19,13 @@ contract NotesContract {
     function createNote(string memory _title, string memory _description)
         public
     {
-        notes[noteCount] = Note(noteCount, _title, _description);
+        notes[noteCount] = Note(noteCount, msg.sender, _title, _description);
         emit NoteCreated(noteCount, _title, _description);
 
         noteCount++;
     }
 
     function deleteNote(uint256 _id) public {
-        // Data Location not specified with uint
-
-        // Data on Blockchain can never be deleted
         delete notes[_id];
         emit NoteDeleted(_id);
     }

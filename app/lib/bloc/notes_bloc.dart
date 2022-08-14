@@ -35,7 +35,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     try {
       emit(state.copyWith(status: NotesStatus.loading));
 
-      await blockchainService.addNote(event.note);
+      await blockchainService.addNote(title: event.title, description: event.description);
       final List<Note>? notes = await blockchainService.fetchNotes();
 
       if (notes == null) throw "Error fetching notes";

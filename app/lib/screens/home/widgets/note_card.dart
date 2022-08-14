@@ -1,8 +1,11 @@
 import 'package:dapp/bloc/notes_bloc.dart';
+import 'package:dapp/constants/routes.dart';
 import 'package:dapp/models/note.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class NoteCard extends StatelessWidget {
   final Note note;
@@ -14,51 +17,62 @@ class NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      focusColor: Colors.transparent,
-      hoverColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
-      onLongPress: () => _initiateDelete(context),
-      child: Container(
-        decoration: BoxDecoration(
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (context) => {},
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            icon: CupertinoIcons.pencil,
+            label: 'Edit',
+          ),
+          SlidableAction(
+            onPressed: (context) => _initiateDelete(context),
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: CupertinoIcons.delete,
+            label: 'Delete',
+          ),
+        ],
+      ),
+
+      // The child of the Slidable is what the user sees when the
+      // component is not dragged.
+      child: InkWell(
+        focusColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onTap: () => Navigator.of(context).pushNamed(Routes.note, arguments: {"noteId": note.id}),
+        child: Container(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(.3),
-              offset: const Offset(1, 1),
-              blurRadius: 5,
-              spreadRadius: 2,
-              blurStyle: BlurStyle.outer,
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    note.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      note.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
                   ),
-                ),
-                Text(
-                  "#${note.id}",
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-            Text(
-              note.description,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+                  Text(
+                    "#${note.id}",
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+              Text(
+                note.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );

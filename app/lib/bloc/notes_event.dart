@@ -15,12 +15,13 @@ class NotesFetch extends NotesEvent {
 }
 
 class NotesAdd extends NotesEvent {
-  const NotesAdd({required this.note});
+  const NotesAdd({required this.title, required this.description});
 
-  final Note note;
+  final String title;
+  final String description;
 
   @override
-  List<Object> get props => [note];
+  List<Object> get props => [title, description];
 }
 
 class NotesDelete extends NotesEvent {

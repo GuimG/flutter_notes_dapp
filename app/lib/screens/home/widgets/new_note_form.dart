@@ -1,5 +1,5 @@
 import 'package:dapp/bloc/notes_bloc.dart';
-import 'package:dapp/models/note.dart';
+import 'package:dapp/constants/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -62,19 +62,18 @@ class _NewNoteFormState extends State<NewNoteForm> {
     );
   }
 
-  _addNote() {
+  void _addNote() {
     if (!_formKey.currentState!.validate()) {
       return;
     }
     _formKey.currentState!.save();
 
-    var tmp = Note(
-      id: 0,
-      title: title,
-      description: description,
-    );
+    String? encryptedTitle = encryptService.encryptAES256(title);
+    String? encryptedDescription = encryptService.encryptAES256(description);
 
-    context.read<NotesBloc>().add(NotesAdd(note: tmp));
-    Navigator.of(context).pop();
+    if (encryptedTitle != null && encryptedDescription != null) {
+      context.read<NotesBloc>().add(NotesAdd(title: encryptedTitle, description: encryptedDescription));
+      Navigator.of(context).pop();
+    }
   }
 }

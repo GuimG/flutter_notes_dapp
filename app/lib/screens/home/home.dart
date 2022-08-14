@@ -1,4 +1,5 @@
 import 'package:dapp/bloc/notes_bloc.dart';
+import 'package:dapp/screens/home/widgets/drawer.dart';
 import 'package:dapp/screens/home/widgets/new_note_form.dart';
 import 'package:dapp/screens/home/widgets/note_card.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: HomeDrawer(),
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0.0,
